@@ -2,8 +2,8 @@ name: Bilibili CFD Daily Push
 
 on:
   schedule:
-    # 修改为：每 5 天的北京时间早上 8:00 运行 (UTC时间 0:00)
-    - cron: '0 0 */5 * *'
+    # 修改为：每 3 天的北京时间早上 8:00 运行 (UTC时间 0:00)
+    - cron: '0 0 */3 * *'
   workflow_dispatch: # 允许手动点击运行测试
 
 jobs:
@@ -26,5 +26,5 @@ jobs:
       - name: Run script
         env:
           PUSH_KEY: ${{ secrets.PUSH_KEY }}
-          BILI_COOKIE: ${{ secrets.BILI_COOKIE }} # 新增：读取你的B站Cookie
+          BILI_COOKIE: ${{ secrets.BILI_COOKIE }} 
         run: python bili_push.py
