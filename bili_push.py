@@ -18,12 +18,11 @@ def search_bilibili(keyword):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         "Cookie": BILI_COOKIE if BILI_COOKIE else "",
-        "Referer": "https://search.bilibili.com/all" # 【新增】告诉B站：我是从搜索主页点进来的，别拦我
+        "Referer": "https://search.bilibili.com/all"
     }
     try:
         response = requests.get(url, params=params, headers=headers)
         
-        # 【新增】详细打印拦截原因
         if response.status_code != 200 or not response.text.strip().startswith('{'):
             print(f"被拦截了！HTTP状态码: {response.status_code}")
             print(f"B站返回的网页内容(前300字): {response.text[:300]}")
@@ -49,7 +48,8 @@ def send_wechat(title, content):
 
 def main():
     today_content = ""
-    time_limit = time.time() - 5 * 24 * 3600
+    # 【已修改】计算 3天前 的时间戳 (3天 * 24小时 * 3600秒)
+    time_limit = time.time() - 3 * 24 * 3600
 
     if not BILI_COOKIE:
         print("⚠️ 警告：没有检测到 BILI_COOKIE！程序可能会被拦截。")
@@ -62,6 +62,7 @@ def main():
             continue
             
         videos = data.get("data", {}).get("result", [])
+        # 筛选出最近 3 天内发布的视频
         new_videos = [v for v in videos if v.get("pubdate", 0) > time_limit]
 
         if new_videos:
@@ -73,9 +74,10 @@ def main():
                 today_content += f"- **{title}** (UP主: {author})\n  [点击观看]({link})\n\n"
 
     if today_content:
-        send_wechat("B站 Fluent/OpenFOAM 最近5天更新", today_content)
+        # 【已修改】推送的标题改为 3 天
+        send_wechat("B站 Fluent/OpenFOAM 最近3天更新", today_content)
     else:
-        print("最近5天没有新的相关视频发布。")
+        print("最近3天没有新的相关视频发布。")
 
 if __name__ == "__main__":
     main()
